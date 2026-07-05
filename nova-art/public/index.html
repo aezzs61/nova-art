@@ -5,103 +5,405 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NovaArt - Gartic LAN</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1e1e24; color: #fff; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; }
-        
-        /* GİRİŞ EKRANI - TÜM EKRANI KAPLAYAN TAM OVERLAY KATMANI */
-        #lobby-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #1e1e24;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* Her şeyin en üstünde durmasını sağlar */
-            padding: 20px;
-        }
-        
-        #lobby-container { background: #2d2d38; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; max-width: 400px; width: 100%; border: 1px solid #444455; }
-        #lobby-container h1 { color: #4da6ff; margin-bottom: 5px; font-size: 28px; font-weight: bold; letter-spacing: 1px; }
-        #lobby-container p { color: #aaa; margin-bottom: 25px; font-size: 14px; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; color: #ff9933; font-weight: bold; font-size: 14px; }
-        #username-input { width: 100%; padding: 12px; background: #15151c; border: 2px solid #444455; border-radius: 6px; color: #fff; font-size: 16px; outline: none; }
-        #join-btn { width: 100%; padding: 12px; background: #ff9933; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
 
-        /* OYUN ALANI DÜZENİ */
-        #game-container { display: none; width: 100%; height: 100%; max-width: 1100px; max-height: 650px; background: #2d2d38; border-radius: 16px; padding: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); position: relative; }
-        #main-container { display: grid; grid-template-columns: 240px 1fr; gap: 15px; width: 100%; height: 100%; }
-        
-        /* MOBİL ÜST BAR */
-        #mobile-header { display: none; width: 100%; background: #15151c; padding: 10px 15px; align-items: center; gap: 15px; border-radius: 8px; border: 1px solid #444455; }
-        #menu-toggle { font-size: 24px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; }
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: #1e1e24; 
+    color: #fff; 
+    height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    overflow: hidden; 
+    position: relative; 
+}
 
-        /* PUAN TABLOSU */
-        #sidebar { background: #15151c; border-radius: 12px; padding: 15px; border: 2px solid #444455; overflow-y: auto; display: flex; flex-direction: column; transition: transform 0.3s ease; }
-        .player-item { padding: 8px; background: #2d2d38; margin-bottom: 5px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; border-left: 4px solid #4da6ff; }
+/* GİRİŞ EKRANI - TÜM EKRANI KAPLAYAN TAM OVERLAY KATMANI */
+#lobby-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #1e1e24;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
 
-        /* SAĞ ALAN İÇERİĞİ */
-        #right-container { display: grid; grid-template-rows: 1fr 1fr; gap: 15px; height: 100%; }
-        
-        /* ÇİZİM ALANI */
-        #game-area { background: #15151c; border-radius: 12px; border: 2px solid #444455; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-       canvas { 
+#lobby-container { 
+    background: #2d2d38; 
+    padding: 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5); 
+    text-align: center; 
+    max-width: 400px; 
+    width: 100%; 
+    border: 1px solid #444455; 
+}
+
+#lobby-container h1 { 
+    color: #4da6ff; 
+    margin-bottom: 5px; 
+    font-size: 28px; 
+    font-weight: bold; 
+    letter-spacing: 1px; 
+}
+
+#lobby-container p { 
+    color: #aaa; 
+    margin-bottom: 25px; 
+    font-size: 14px; 
+}
+
+.input-group { 
+    margin-bottom: 20px; 
+    text-align: left; 
+}
+
+.input-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    color: #ff9933; 
+    font-weight: bold; 
+    font-size: 14px; 
+}
+
+#username-input { 
+    width: 100%; 
+    padding: 12px; 
+    background: #15151c; 
+    border: 2px solid #444455; 
+    border-radius: 6px; 
+    color: #fff; 
+    font-size: 16px; 
+    outline: none; 
+}
+
+#join-btn { 
+    width: 100%; 
+    padding: 12px; 
+    background: #ff9933; 
+    border: none; 
+    color: white; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    font-size: 16px; 
+}
+
+/* OYUN ALANI DÜZENİ - SABİT PİKSEL YERİNE ESNEK YÜKSEKLİK */
+#game-container { 
+    display: none; 
+    width: 100%; 
+    height: 90vh; 
+    max-width: 1100px; 
+    max-height: 700px; 
+    background: #2d2d38; 
+    border-radius: 16px; 
+    padding: 15px; 
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4); 
+    position: relative; 
+}
+
+#main-container { 
+    display: grid; 
+    grid-template-columns: 240px 1fr; 
+    gap: 15px; 
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; 
+}
+
+/* MOBİL ÜST BAR (Normalde Gizli) */
+#mobile-header { 
+    display: none; 
+    width: 100%; 
+    background: #15151c; 
+    padding: 10px 15px; 
+    align-items: center; 
+    gap: 15px; 
+    border-radius: 8px; 
+    border: 1px solid #444455; 
+}
+
+#menu-toggle { 
+    font-size: 24px; 
+    background: none; 
+    border: none; 
+    color: #fff; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+}
+
+/* PUAN TABLOSU (SIDEBAR) */
+#sidebar { 
+    background: #15151c; 
+    border-radius: 12px; 
+    padding: 15px; 
+    border: 2px solid #444455; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    height: 100%; 
+    transition: transform 0.3s ease; 
+}
+
+.player-item { 
+    padding: 8px; 
+    background: #2d2d38; 
+    margin-bottom: 5px; 
+    border-radius: 6px; 
+    font-size: 13px; 
+    display: flex; 
+    justify-content: space-between; 
+    border-left: 4px solid #4da6ff; 
+}
+
+/* SAĞ ALAN İÇERİĞİ */
+#right-container { 
+    display: grid; 
+    grid-template-rows: 1fr 1fr; 
+    gap: 15px; 
+    height: 100%; 
+    overflow: hidden;
+}
+
+/* ÇİZİM ALANI */
+#game-area { 
+    background: #15151c; 
+    border-radius: 12px; 
+    border: 2px solid #444455; 
+    padding: 10px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: space-between; 
+    overflow: hidden;
+}
+
+/* Canvas'ın Etrafındaki Kapsayıcı Kutu */
+.canvas-wrapper {
+    width: 100%;
+    flex-grow: 1; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    min-height: 0; 
+}
+
+/* Esnek ve Taşmayan Tuval Tasarımı */
+canvas { 
     background: white; 
     border-radius: 8px; 
     cursor: crosshair; 
-    width: 600px;  /* Yüzdelik veya max-width yerine sabit genişlik */
-    height: 350px; /* Sabit yükseklik */
+    width: 100%;       
+    height: 100%;      
+    max-width: 550px;  
+    max-height: 240px; 
+    object-fit: contain; 
     touch-action: none; 
     box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
 }
 
-/* Telefon ekranında taşmasın diye mobilde esnek kalmasını sağlıyoruz
+/* TAHMİN / SOHBET ALANI */
+#chat-area { 
+    background: #15151c; 
+    border-radius: 12px; 
+    border: 2px solid #444455; 
+    padding: 12px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    overflow: hidden; 
+    height: 100%;
+}
 
-        /* TAHMİN / SOHBET ALANI */
-        #chat-area { background: #15151c; border-radius: 12px; border: 2px solid #444455; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-        #messages { flex-grow: 1; overflow-y: auto; list-style: none; padding: 5px; margin-bottom: 8px; background: #1e1e24; border-radius: 6px; }
-        #messages li { padding: 6px 10px; border-bottom: 1px solid #2d2d38; font-size: 13px; word-break: break-all; }
-        #chat-input { width: 100%; padding: 10px; background: #2d2d38; border: 1px solid #444455; color: #fff; border-radius: 6px; outline: none; }
+#messages { 
+    flex-grow: 1; 
+    overflow-y: auto; 
+    list-style: none; 
+    padding: 5px; 
+    margin-bottom: 8px; 
+    background: #1e1e24; 
+    border-radius: 6px; 
+}
 
-        /* Bilgi ve Palet Barları */
-        .header-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        #word-display { font-size: 16px; color: #ff9933; font-weight: bold; }
-        #category-display { font-size: 12px; color: #aaa; font-style: italic; }
-        #timer-display { font-size: 18px; font-weight: bold; color: #ff4d4d; font-family: monospace; }
-        
-        .controls { margin-top: 8px; width: 100%; display: flex; justify-content: center; gap: 10px; align-items: center; }
-        .btn-clear { padding: 5px 12px; background: #d9534f; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
-        #brush-settings { display: none; gap: 10px; align-items: center; }
-        #color-palette { display: flex; gap: 6px; }
-        .color-box { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 1.5px solid #fff; }
-        .color-box.active { border-color: #ff9933; box-shadow: 0 0 6px #ff9933; }
-        #thickness-slider { width: 60px; cursor: pointer; }
+#messages li { 
+    padding: 6px 10px; 
+    border-bottom: 1px solid #2d2d38; 
+    font-size: 13px; 
+    word-break: break-all; 
+}
 
-        /* TELEFON İÇİN RESPONSIVE AYARLARI */
-        @media (max-width: 768px) {
-            body { padding: 0; }
-            #game-container { border-radius: 0; padding: 8px; display: flex; flex-direction: column; gap: 8px; max-height: 100vh; width: 100%; }
-            #mobile-header { display: flex; }
-            
-            #main-container { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; height: calc(100% - 50px); position: relative; }
-            #right-container { display: flex; flex-direction: column; gap: 8px; height: 100%; }
-            
-            #game-area { flex: 1.1; width: 100%; }
-            #chat-area { flex: 0.9; width: 100%; }
-            canvas { max-height: 200px; }
-            #messages { height: 100px; }
+#chat-input { 
+    width: 100%; 
+    padding: 10px; 
+    background: #2d2d38; 
+    border: 1px solid #444455; 
+    color: #fff; 
+    border-radius: 6px; 
+    outline: none; 
+}
 
-            #sidebar {
-                position: absolute;
-                left: 0; top: 0; bottom: 0;
-                width: 200px;
-                z-index: 5;
-                transform: translateX(-210px);
-                box-shadow: 4px 0 12px rgba(0,0,0,0.5);
-            }
-            #sidebar.open { transform: translateX(0); }
-            .color-box { width: 28px; height: 28px; }
-        }
+/* Bilgi ve Palet Barları */
+.header-bar { 
+    width: 100%; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 5px; 
+}
+
+#word-display { 
+    font-size: 16px; 
+    color: #ff9933; 
+    font-weight: bold; 
+}
+
+#category-display { 
+    font-size: 12px; 
+    color: #aaa; 
+    font-style: italic; 
+}
+
+#timer-display { 
+    font-size: 18px; 
+    font-weight: bold; 
+    color: #ff4d4d; 
+    font-family: monospace; 
+}
+
+.controls { 
+    margin-top: 8px; 
+    width: 100%; 
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    align-items: center; 
+}
+
+.btn-clear { 
+    padding: 5px 12px; 
+    background: #d9534f; 
+    border: none; 
+    color: white; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    font-size: 12px; 
+}
+
+#brush-settings { 
+    display: none; 
+    gap: 10px; 
+    align-items: center; 
+}
+
+#color-palette { 
+    display: flex; 
+    gap: 6px; 
+}
+
+.color-box { 
+    width: 22px; 
+    height: 22px; 
+    border-radius: 50%; 
+    cursor: pointer; 
+    border: 1.5px solid #fff; 
+}
+
+.color-box.active { 
+    border-color: #ff9933; 
+    box-shadow: 0 0 6px #ff9933; 
+}
+
+#thickness-slider { 
+    width: 60px; 
+    cursor: pointer; 
+}
+
+/* ======================================================= */
+/* TELEFON İÇİN RESPONSIVE AYARLARI                        */
+/* ======================================================= */
+@media (max-width: 768px) {
+    body { 
+        padding: 0; 
+    }
+    
+    #game-container { 
+        border-radius: 0; 
+        padding: 8px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+        max-height: 100vh; 
+        width: 100%; 
+        height: 100vh;
+    }
+    
+    #mobile-header { 
+        display: flex; 
+    }
+    
+    #main-container { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+        flex-grow: 1; 
+        height: calc(100% - 50px); 
+        position: relative; 
+    }
+    
+    #right-container { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+        height: 100%; 
+    }
+    
+    #game-area { 
+        flex: 1.1; 
+        width: 100%; 
+    }
+    
+    #chat-area { 
+        flex: 0.9; 
+        width: 100%; 
+    }
+    
+    canvas { 
+        max-height: 200px; 
+    }
+    
+    #messages { 
+        height: 100px; 
+    }
+
+    #sidebar {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 200px;
+        z-index: 5;
+        transform: translateX(-210px);
+        box-shadow: 4px 0 12px rgba(0,0,0,0.5);
+    }
+    
+    #sidebar.open { 
+        transform: translateX(0); 
+    }
+    
+    .color-box { 
+        width: 28px; 
+        height: 28px; 
+    }
+}
     </style>
 </head>
 <body>
