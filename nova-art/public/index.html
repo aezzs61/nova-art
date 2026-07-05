@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaArt - Gartic LAN</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1e1e24; color: #fff; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; }
+        
+        /* GİRİŞ EKRANI - TÜM EKRANI KAPLAYAN TAM OVERLAY KATMANI */
+        #lobby-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #1e1e24;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Her şeyin en üstünde durmasını sağlar */
+            padding: 20px;
+        }
+        
+        #lobby-container { background: #2d2d38; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; max-width: 400px; width: 100%; border: 1px solid #444455; }
+        #lobby-container h1 { color: #4da6ff; margin-bottom: 5px; font-size: 28px; font-weight: bold; letter-spacing: 1px; }
+        #lobby-container p { color: #aaa; margin-bottom: 25px; font-size: 14px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: #ff9933; font-weight: bold; font-size: 14px; }
+        #username-input { width: 100%; padding: 12px; background: #15151c; border: 2px solid #444455; border-radius: 6px; color: #fff; font-size: 16px; outline: none; }
+        #join-btn { width: 100%; padding: 12px; background: #ff9933; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; }
+
+        /* OYUN ALANI DÜZENİ */
+        #game-container { display: none; width: 100%; height: 100%; max-width: 1100px; max-height: 650px; background: #2d2d38; border-radius: 16px; padding: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); position: relative; }
+        #main-container { display: grid; grid-template-columns: 240px 1fr; gap: 15px; width: 100%; height: 100%; }
+        
+        /* MOBİL ÜST BAR */
+        #mobile-header { display: none; width: 100%; background: #15151c; padding: 10px 15px; align-items: center; gap: 15px; border-radius: 8px; border: 1px solid #444455; }
+        #menu-toggle { font-size: 24px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; }
+
+        /* PUAN TABLOSU */
+        #sidebar { background: #15151c; border-radius: 12px; padding: 15px; border: 2px solid #444455; overflow-y: auto; display: flex; flex-direction: column; transition: transform 0.3s ease; }
+        .player-item { padding: 8px; background: #2d2d38; margin-bottom: 5px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; border-left: 4px solid #4da6ff; }
+
+        /* SAĞ ALAN İÇERİĞİ */
+        #right-container { display: grid; grid-template-rows: 1fr 1fr; gap: 15px; height: 100%; }
+        
+        /* ÇİZİM ALANI */
+        #game-area { background: #15151c; border-radius: 12px; border: 2px solid #444455; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+       canvas { 
+    background: white; 
+    border-radius: 8px; 
+    cursor: crosshair; 
+    width: 600px;  /* Yüzdelik veya max-width yerine sabit genişlik */
+    height: 350px; /* Sabit yükseklik */
+    touch-action: none; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+}
+
+/* Telefon ekranında taşmasın diye mobilde esnek kalmasını sağlıyoruz
+
+        /* TAHMİN / SOHBET ALANI */
+        #chat-area { background: #15151c; border-radius: 12px; border: 2px solid #444455; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+        #messages { flex-grow: 1; overflow-y: auto; list-style: none; padding: 5px; margin-bottom: 8px; background: #1e1e24; border-radius: 6px; }
+        #messages li { padding: 6px 10px; border-bottom: 1px solid #2d2d38; font-size: 13px; word-break: break-all; }
+        #chat-input { width: 100%; padding: 10px; background: #2d2d38; border: 1px solid #444455; color: #fff; border-radius: 6px; outline: none; }
+
+        /* Bilgi ve Palet Barları */
+        .header-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        #word-display { font-size: 16px; color: #ff9933; font-weight: bold; }
+        #category-display { font-size: 12px; color: #aaa; font-style: italic; }
+        #timer-display { font-size: 18px; font-weight: bold; color: #ff4d4d; font-family: monospace; }
+        
+        .controls { margin-top: 8px; width: 100%; display: flex; justify-content: center; gap: 10px; align-items: center; }
+        .btn-clear { padding: 5px 12px; background: #d9534f; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        #brush-settings { display: none; gap: 10px; align-items: center; }
+        #color-palette { display: flex; gap: 6px; }
+        .color-box { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 1.5px solid #fff; }
+        .color-box.active { border-color: #ff9933; box-shadow: 0 0 6px #ff9933; }
+        #thickness-slider { width: 60px; cursor: pointer; }
+
+        /* TELEFON İÇİN RESPONSIVE AYARLARI */
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            #game-container { border-radius: 0; padding: 8px; display: flex; flex-direction: column; gap: 8px; max-height: 100vh; width: 100%; }
+            #mobile-header { display: flex; }
+            
+            #main-container { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; height: calc(100% - 50px); position: relative; }
+            #right-container { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+            
+            #game-area { flex: 1.1; width: 100%; }
+            #chat-area { flex: 0.9; width: 100%; }
+            canvas { max-height: 200px; }
+            #messages { height: 100px; }
+
+            #sidebar {
+                position: absolute;
+                left: 0; top: 0; bottom: 0;
+                width: 200px;
+                z-index: 5;
+                transform: translateX(-210px);
+                box-shadow: 4px 0 12px rgba(0,0,0,0.5);
+            }
+            #sidebar.open { transform: translateX(0); }
+            .color-box { width: 28px; height: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TAM EKRAN KAPLAYAN GİRİŞ KATMANI -->
+    <div id="lobby-overlay">
+        <div id="lobby-container">
+            <h1>NovaArt</h1>
+            <p>Gartic LAN Odası</p>
+            <div class="input-group">
+                <label for="username-input">Kullanıcı Adın</label>
+                <input type="text" id="username-input" placeholder="Takma adını yaz..." maxlength="15" autocomplete="off" />
+            </div>
+            <button id="join-btn">Oyuna Katıl</button>
+        </div>
+    </div>
+
+    <!-- OYUN ALANI -->
+    <div id="game-container">
+        
+        <div id="mobile-header">
+            <button id="menu-toggle">☰</button>
+            <span style="font-weight: bold; font-size: 15px; color: #4da6ff;">→ Kullanıcılar</span>
+        </div>
+
+        <div id="main-container">
+            
+            <div id="sidebar">
+                <h4 style="color: #4da6ff; margin-bottom: 10px; font-size: 13px; border-bottom: 1px solid #444455; padding-bottom: 4px;">Puan Tablosu</h4>
+                <div id="player-list"></div>
+            </div>
+
+            <div id="right-container">
+                
+                <div id="game-area">
+                    <div class="header-bar">
+                        <div>
+                            <h2 id="word-display">Yükleniyor...</h2>
+                            <div id="category-display"></div>
+                        </div>
+                        <div id="timer-display">01:30</div>
+                    </div>
+                    
+                    <canvas id="canvas" width="600" height="350"></canvas>
+                    
+                    <div class="controls">
+                        <div id="brush-settings">
+                            <div id="color-palette">
+                                <div class="color-box active" style="background: #000000;" data-color="#000000"></div>
+                                <div class="color-box" style="background: #d9534f;" data-color="#d9534f"></div>
+                                <div class="color-box" style="background: #0275d8;" data-color="#0275d8"></div>
+                                <div class="color-box" style="background: #5cb85c;" data-color="#5cb85c"></div>
+                                <div class="color-box" style="background: #f0ad4e;" data-color="#f0ad4e"></div>
+                            </div>
+                            <div class="thickness-container">
+                                <input type="range" id="thickness-slider" min="2" max="25" value="4" />
+                            </div>
+                            <button id="clear-btn" class="btn-clear">Temizle</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chat-area">
+                    <ul id="messages"></ul>
+                    <input type="text" id="chat-input" placeholder="Tahmininizi buraya yazın..." disabled />
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        const lobbyOverlay = document.getElementById('lobby-overlay');
+        const gameContainer = document.getElementById('game-container');
+        const usernameInput = document.getElementById('username-input');
+        const joinBtn = document.getElementById('join-btn');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const chatInput = document.getElementById('chat-input');
+        const messages = document.getElementById('messages');
+        const wordDisplay = document.getElementById('word-display');
+        const categoryDisplay = document.getElementById('category-display');
+        const timerDisplay = document.getElementById('timer-display');
+        const clearBtn = document.getElementById('clear-btn');
+        const brushSettings = document.getElementById('brush-settings');
+        const thicknessSlider = document.getElementById('thickness-slider');
+        
+        let drawing = false; let isDrawer = false;
+        let currentColor = "#000000";
+        let currentLineWidth = 4;
+
+        joinBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            if (username === "") { alert("Lütfen bir kullanıcı adı girin!"); return; }
+            
+            // Giriş katmanını tamamen ortadan kaldır, oyun konteynerini aç
+            lobbyOverlay.style.display = 'none';
+            gameContainer.style.display = 'flex';
+            
+            socket.emit('join-game', username);
+        });
+
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') joinBtn.click();
+        });
+
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('open');
+        });
+
+        document.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+        sidebar.addEventListener('click', (e) => e.stopPropagation());
+
+        document.querySelectorAll('.color-box').forEach(box => {
+            box.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-box').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentColor = e.target.getAttribute('data-color');
+            });
+        });
+
+        thicknessSlider.addEventListener('input', (e) => {
+            currentLineWidth = e.target.value;
+        });
+
+        socket.on('timer-update', (seconds) => {
+            let mins = Math.floor(seconds / 60);
+            let secs = seconds % 60;
+            timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        });
+
+        socket.on('role-assignment', (data) => {
+            isDrawer = data.isDrawer; 
+            chatInput.disabled = false;
+            
+            if (data.category) {
+                categoryDisplay.innerText = "Kategori: " + data.category;
+            } else {
+                categoryDisplay.innerText = "";
+            }
+
+            if (isDrawer) {
+                wordDisplay.innerText = "Çizeceğin Kelime: " + data.word;
+                brushSettings.style.display = "flex"; 
+            } else {
+                wordDisplay.innerText = "Kelimeyi tahmin etmeye çalışın!";
+                brushSettings.style.display = "none";
+            }
+        });
+
+        function getCoordinates(e) {
+    const rect = canvas.getBoundingClientRect();
+    
+    // Hem dokunmatik (Telefon) hem de mouse (PC) için ekran üzerindeki ham koordinatı alıyoruz
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    // Canvas'ın HTML içindeki gerçek genişlik/yükseklik oranını buluyoruz
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    // Ham koordinattan canvas'ın sol/üst boşluğunu çıkarıp oranla çarpıyoruz
+    // Bu yöntem hem PC'de hem telefonda kaymayı KESİN OLARAK sıfırlar.
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+    };
+}
+
+        function startDrawing(e) {
+            if (!isDrawer) return; drawing = true;
+            const coords = getCoordinates(e);
+            ctx.beginPath(); ctx.moveTo(coords.x, coords.y);
+        }
+        
+        function stopDrawing() {
+            drawing = false; ctx.beginPath();
+            if (isDrawer) socket.emit('drawing', { drawing: false });
+        }
+        
+        function draw(e) {
+            if (!drawing || !isDrawer) return;
+            if (e.touches) e.preventDefault(); 
+            const coords = getCoordinates(e);
+            
+            ctx.lineWidth = currentLineWidth; 
+            ctx.lineCap = 'round'; 
+            ctx.strokeStyle = currentColor;
+
+            ctx.lineTo(coords.x, coords.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(coords.x, coords.y);
+            socket.emit('drawing', { 
+                x: coords.x, 
+                y: coords.y, 
+                drawing: true, 
+                color: currentColor,
+                width: currentLineWidth 
+            });
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseleave', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchmove', draw, { passive: false });
+
+        socket.on('drawing', (data) => {
+            if (data.drawing === false) { ctx.beginPath(); return; }
+            ctx.lineWidth = data.width || 4; 
+            ctx.lineCap = 'round'; 
+            ctx.strokeStyle = data.color || '#000000';
+            ctx.lineTo(data.x, data.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(data.x, data.y);
+        });
+
+        clearBtn.addEventListener('click', () => socket.emit('clear-canvas'));
+        socket.on('clear-canvas', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && chatInput.value.trim() !== "") {
+                socket.emit('send-message', chatInput.value); chatInput.value = "";
+            }
+        });
+        
+        socket.on('update-players', (playerList) => {
+            const list = document.getElementById('player-list');
+            list.innerHTML = playerList.map(p => `<div class="player-item"><span>${p.username}</span><strong>${p.score} DP</strong></div>`).join('');
+        });
+        
+        socket.on('chat-message', (data) => {
+            messages.innerHTML += `<li><strong>${data.username}:</strong> ${data.message}</li>`;
+            messages.scrollTop = messages.scrollHeight;
+        });
+        
+        socket.on('system-message', (msg) => {
+            messages.innerHTML += `<li style="color: #00ff00; background: rgba(0,255,0,0.1);"><em>${msg}</em></li>`;
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        // F12 / Konsol Uyarı Yazısı
+console.log(
+    "%cNovaArt %c- Dur!", 
+    "color: #4da6ff; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);", 
+    "color: #ff4d4d; font-size: 30px; font-weight: bold;"
+);
+
+console.log(
+    "%cBu alan NovaArt Gartic LAN sisteminin motorudur. Kodları değiştirmeye çalışmak oyununun çökmesine neden olabilir! \n%cEğer bir geliştiriciysen ve parolayı biliyorsan konsola şunu yaz: %cparola('GİZLİ_ŞİFRE')", 
+    "color: #fff; font-size: 14px; background: #2d2d38; padding: 10px; border-radius: 6px; line-height: 20px;",
+    "color: #aaa; font-size: 14px;",
+    "color: #ff9933; font-weight: bold; font-family: monospace; font-size: 14px;"
+);
+
+// Geliştiriciler için gizli parola fonksiyonu
+window.parola = function(sifre) {
+    const dogruSifre = "nova61"; // Belirlediğin gizli şifre
+    
+    if (sifre === dogruSifre) {
+        console.log("%cTebrikler Geliştirici! Erişim onaylandı. Oyun sohbetine özel durumun bildirildi. 😎", "color: #00ff00; font-size: 14px; font-weight: bold;");
+        
+        // Sunucuya geliştirici olunduğuna dair gizli bir mesaj gönder
+        socket.emit('send-message', "Sisteme sızdı! Ben NovaArt Geliştiricisiyim! 🛠️");
+    } else {
+        console.log("%cHatalı Parola! Kodları incelemeye devam et. ❌", "color: #ff4d4d; font-size: 14px; font-weight: bold;");
+    }
+};
+    </script>
+</body>
+</html>
