@@ -169,3 +169,18 @@ const PORT = 3000;
 http.listen(PORT, '0.0.0.0', () => {
     console.log(`NovaArt sunucusu aktif: http://localhost:${PORT}`);
 });
+
+// Eğer konsoldan bir komutla tetiklemek istersen sunucu terminaline şunu yazabilmen için:
+process.stdin.on('data', (data) => {
+    const command = data.toString().trim();
+    
+    if (command === "guncelleme-basla") {
+        console.log("🛠️ Güncelleme modu aktif edildi! Oyuncular kilitlendi.");
+        io.emit('maintenance-start'); // Herkese sinyal gönderir
+    }
+    
+    if (command === "guncelleme-bitir") {
+        console.log("✅ Güncelleme bitti! Oyuncuların kilidi açıldı.");
+        io.emit('maintenance-end'); // Ekranı kapatır
+    }
+});
