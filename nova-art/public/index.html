@@ -123,7 +123,7 @@
             overflow: hidden; 
         }
 
-        /* MOBİL ÜST BAR (Normalde Gizli) */
+        /* MOBİL ÜST BAR */
         #mobile-header { 
             display: none; 
             width: 100%; 
@@ -207,7 +207,7 @@
             background: white; 
             border-radius: 8px; 
             cursor: crosshair; 
-            width: 100%;       
+            width: 100%;      
             height: 100%;      
             max-width: 550px;  
             max-height: 240px; 
@@ -308,11 +308,15 @@
             display: none; 
             gap: 10px; 
             align-items: center; 
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         #color-palette { 
             display: flex; 
-            gap: 6px; 
+            gap: 4px; 
+            flex-wrap: wrap;
+            max-width: 280px;
         }
 
         .color-box { 
@@ -321,11 +325,17 @@
             border-radius: 50%; 
             cursor: pointer; 
             border: 1.5px solid #fff; 
+            transition: transform 0.1s;
+        }
+
+        .color-box:hover {
+            transform: scale(1.1);
         }
 
         .color-box.active { 
             border-color: #ff9933; 
             box-shadow: 0 0 6px #ff9933; 
+            transform: scale(1.1);
         }
 
         #thickness-slider { 
@@ -333,8 +343,44 @@
             cursor: pointer; 
         }
 
+        /* Silgi Butonu */
+        .btn-eraser {
+            padding: 5px 10px;
+            background: #444455;
+            border: 1.5px solid #fff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-eraser.active {
+            background: #ff9933;
+            border-color: #fff;
+        }
+
+        /* Sağdan Sola (RTL) Düzeni */
+        .rtl {
+            direction: rtl;
+        }
+        .rtl #main-container {
+            grid-template-columns: 1fr 240px;
+        }
+        .rtl #sidebar {
+            border-left: 2px solid #444455;
+            border-right: none;
+        }
+        .rtl .player-item {
+            border-left: none;
+            border-right: 4px solid #4da6ff;
+        }
+
         /* ======================================================= */
-        /* TELEFON İÇİN RESPONSIVE AYARLARI                        */
+        /* TELEFON İÇİR RESPONSIVE AYARLARI                        */
         /* ======================================================= */
         @media (max-width: 768px) {
             body { 
@@ -404,8 +450,8 @@
             }
             
             .color-box { 
-                width: 28px; 
-                height: 28px; 
+                width: 24px; 
+                height: 24px; 
             }
         }
 
@@ -427,7 +473,16 @@
 
     <audio id="lobbyMusic" src="/assets/sound/lobby-music.wav" loop></audio>
 
-    <div style="position: absolute; top: 15px; right: 15px; z-index: 10000; display: flex; gap: 10px;">
+    <div style="position: absolute; top: 15px; right: 15px; z-index: 10000; display: flex; gap: 10px; align-items: center;">
+        <select id="lang-select" onchange="changeLanguage(this.value)" style="padding: 10px; border-radius: 8px; border: none; background: #2d2d38; color: #fff; font-weight: bold; cursor: pointer; outline: none;">
+            <option value="tr">Türkçe</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="es">Español</option>
+            <option value="ar">العربية</option>
+        </select>
+        
         <button onclick="toggleMute()" id="muteBtn" style="padding: 12px 20px; font-family: sans-serif; cursor: pointer; border-radius: 8px; border: none; background: #38bdf8; color: white; font-weight: bold;">
             🎵 Müziği Aç
         </button>
@@ -437,37 +492,37 @@
     <div style="display: flex; gap: 20px; max-width: 850px; width: 100%; align-items: stretch; justify-content: center; flex-wrap: wrap;">
         
         <div id="lobby-container" style="flex: 1; min-width: 320px; margin: 0;">
-            <h1>NovaArt</h1>
-            <p>NovaArt Odası</p>
+            <h1 id="lobby-title">NovaArt</h1>
+            <p id="lobby-subtitle">NovaArt Odası</p>
             <div class="input-group">
-                <label for="username-input">Kullanıcı Adın</label>
+                <label for="username-input" id="lbl-username">Kullanıcı Adın</label>
                 <input type="text" id="username-input" placeholder="Takma adını yaz..." maxlength="15" autocomplete="off" />
             </div>
             <button id="join-btn">Oyuna Katıl</button>
         </div>
 
         <div style="flex: 1; min-width: 320px; background: #2d2d38; padding: 25px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #444455; display: flex; flex-direction: column; text-align: left;">
-            <h2 style="color: #ff9933; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #444455; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-                🚀 Son Güncellemeler (v2.0)
+            <h2 id="updates-title" style="color: #ff9933; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #444455; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                🚀 Son Güncellemeler (v3.0)
             </h2>
             
             <div style="overflow-y: auto; flex-grow: 1; max-height: 220px; padding-right: 5px;">
-                <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px;">
+                <ul id="updates-list" style="list-style: none; display: flex; flex-direction: column; gap: 12px;">
                     <li style="font-size: 14px; line-height: 20px;">
-                        <strong style="color: #4da6ff;">🎵 Özel Lobi Müziği:</strong> 
-                        Chrome Music Lab üzerinde sıfırdan bestelenen, indie retro tarzı arka plan müzik motoru entegre edildi!
+                        <strong style="color: #4da6ff;">🌍 Çoklu Dil Desteği:</strong> 
+                        Türkçe, İngilizce, Fransızca, Almanca, İspanyolca ve Arapça (sağdan sola düzenli) dil desteği eklendi!
                     </li>
                     <li style="font-size: 14px; line-height: 20px;">
-                        <strong style="color: #4da6ff;">✨ Fare Takip Efekti:</strong> 
-                        Çizim havasını tam yakalamak için farenin arkasından akan akıcı, neon mavi interaktif çizgi sistemi eklendi.
+                        <strong style="color: #4da6ff;">🧽 Profesyonel Silgi Aracı:</strong> 
+                        Çizimlerinizi detaylıca temizleyebilmeniz için fırça boyutuyla senkronize olan dinamik silgi dahil edildi.
                     </li>
                     <li style="font-size: 14px; line-height: 20px;">
-                        <strong style="color: #4da6ff;">🛠️ Sunucu Bakım Modu:</strong> 
-                        Kodlar güncellenirken oyuncuların bağlantısını koparmayan ve ekranı otomatik kilitleyen profesyonel güncelleme ekranı kuruldu.
+                        <strong style="color: #4da6ff;">🎨 Bordo-Mavi ve Geniş Renkler:</strong> 
+                        Renk paleti 10 renge çıkarılarak en başa asil Trabzonspor bordo-mavi renk ikilisi yerleştirildi.
                     </li>
                     <li style="font-size: 14px; line-height: 20px;">
-                        <strong style="color: #4da6ff;">🐛 Hata Temizliği:</strong> 
-                        Canvas değişken çakışmaları çözüldü, dosya yolları stabilize edildi ve hayalet ses tetiklenmeleri tamamen engellendi.
+                        <strong style="color: #4da6ff;">🌀 Kayan Sekme Başlığı:</strong> 
+                        Tarayıcı sekmesindeki NovaArt başlığı artık hareketli ve canlı!
                     </li>
                 </ul>
             </div>
@@ -483,11 +538,11 @@
     <div id="maintenance-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(30, 30, 36, 0.95); display: none; justify-content: center; align-items: center; z-index: 100000; text-align: center; padding: 20px; font-family: sans-serif;">
     <div style="background: #2d2d38; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); max-width: 450px; width: 100%; border: 2px solid #ff9933;">
         <div style="font-size: 50px; margin-bottom: 20px;">🛠️</div>
-        <h2 style="color: #ff9933; margin-bottom: 15px; font-size: 24px;">Sistem Güncelleniyor</h2>
-        <p style="color: #eee; font-size: 15px; line-height: 24px; margin-bottom: 10px;">
+        <h2 id="maint-title" style="color: #ff9933; margin-bottom: 15px; font-size: 24px;">Sistem Güncelleniyor</h2>
+        <p id="maint-desc1" style="color: #eee; font-size: 15px; line-height: 24px; margin-bottom: 10px;">
             NovaArt şu anda güncelleniyor. Lütfen bağlantıyı kesmeyin ve güncellemenin bitmesini bekleyin.
         </p>
-        <p style="color: #aaa; font-size: 13px; font-style: italic;">
+        <p id="maint-desc2" style="color: #aaa; font-size: 13px; font-style: italic;">
             Güncelleme tamamlandığında oyun otomatik olarak devam edecektir...
         </p>
     </div>
@@ -497,13 +552,13 @@
         
         <div id="mobile-header">
             <button id="menu-toggle">☰</button>
-            <span style="font-weight: bold; font-size: 15px; color: #4da6ff;">→ Kullanıcılar</span>
+            <span id="mobile-users-title" style="font-weight: bold; font-size: 15px; color: #4da6ff;">→ Kullanıcılar</span>
         </div>
 
         <div id="main-container">
             
             <div id="sidebar">
-                <h4 style="color: #4da6ff; margin-bottom: 10px; font-size: 13px; border-bottom: 1px solid #444455; padding-bottom: 4px;">Puan Tablosu</h4>
+                <h4 id="sidebar-score-title" style="color: #4da6ff; margin-bottom: 10px; font-size: 13px; border-bottom: 1px solid #444455; padding-bottom: 4px;">Puan Tablosu</h4>
                 <div id="player-list"></div>
             </div>
 
@@ -523,12 +578,18 @@
                     <div class="controls">
                         <div id="brush-settings">
                             <div id="color-palette">
-                                <div class="color-box active" style="background: #000000;" data-color="#000000"></div>
+                                <div class="color-box active" style="background: #800020;" data-color="#800020"></div> <div class="color-box" style="background: #1E90FF;" data-color="#1E90FF"></div> <div class="color-box" style="background: #000000;" data-color="#000000"></div>
                                 <div class="color-box" style="background: #d9534f;" data-color="#d9534f"></div>
                                 <div class="color-box" style="background: #0275d8;" data-color="#0275d8"></div>
                                 <div class="color-box" style="background: #5cb85c;" data-color="#5cb85c"></div>
                                 <div class="color-box" style="background: #f0ad4e;" data-color="#f0ad4e"></div>
+                                <div class="color-box" style="background: #e67e22;" data-color="#e67e22"></div>
+                                <div class="color-box" style="background: #9b59b6;" data-color="#9b59b6"></div>
+                                <div class="color-box" style="background: #1abc9c;" data-color="#1abc9c"></div>
                             </div>
+                            <button id="eraser-btn" class="btn-eraser">
+                                🧽 <span id="txt-eraser">Silgi</span>
+                            </button>
                             <div class="thickness-container">
                                 <input type="range" id="thickness-slider" min="2" max="25" value="4" />
                             </div>
@@ -568,11 +629,243 @@
         const clearBtn = document.getElementById('clear-btn');
         const brushSettings = document.getElementById('brush-settings');
         const thicknessSlider = document.getElementById('thickness-slider');
+        const eraserBtn = document.getElementById('eraser-btn');
         
         let drawing = false; let isDrawer = false;
-        let currentColor = "#000000";
+        let currentColor = "#800020"; // Varsayılan renk Bordo!
         let currentLineWidth = 4;
+        let isEraserActive = false;
 
+        // --- SÖZLÜK VE DİL SEÇİM MOTORU (v3.0) ---
+        const dictionary = {
+            tr: {
+                lobbyTitle: "NovaArt",
+                lobbySubtitle: "NovaArt Odası",
+                lblUsername: "Kullanıcı Adın",
+                placeholderUsername: "Takma adını yaz...",
+                btnJoin: "Oyuna Katıl",
+                updatesTitle: "🚀 Son Güncellemeler (v3.0)",
+                maintTitle: "Sistem Güncelleniyor",
+                maintDesc1: "NovaArt şu anda güncelleniyor. Lütfen bağlantıyı kesmeyin ve güncellemenin bitmesini bekleyin.",
+                maintDesc2: "Güncelleme tamamlandığında oyun otomatik olarak devam edecektir...",
+                mobileUsers: "→ Kullanıcılar",
+                scoreTitle: "Puan Tablosu",
+                clear: "Temizle",
+                eraser: "Silgi",
+                placeholderChat: "Tahmininizi buraya yazın...",
+                loading: "Yükleniyor...",
+                wordWait: "Kelimeyi tahmin etmeye çalışın!",
+                drawTask: "Çizeceğin Kelime: ",
+                category: "Kategori: ",
+                updates: [
+                    `<strong style="color: #4da6ff;">🌍 Çoklu Dil Desteği:</strong> Türkçe, İngilizce, Fransızca, Almanca, İspanyolca ve Arapça (sağdan sola düzenli) dil desteği eklendi!`,
+                    `<strong style="color: #4da6ff;">🧽 Profesyonel Silgi Aracı:</strong> Çizimlerinizi detaylıca temizleyebilmeniz için fırça boyutuyla senkronize olan dinamik silgi dahil edildi.`,
+                    `<strong style="color: #4da6ff;">🎨 Bordo-Mavi ve Geniş Renkler:</strong> Renk paleti 10 renge çıkarılarak en başa asil Trabzonspor bordo-mavi renk ikilisi yerleştirildi.`,
+                    `<strong style="color: #4da6ff;">🌀 Kayan Sekme Başlığı:</strong> Tarayıcı sekmesindeki NovaArt başlığı artık hareketli ve canlı!`
+                ]
+            },
+            en: {
+                lobbyTitle: "NovaArt",
+                lobbySubtitle: "NovaArt Room",
+                lblUsername: "Your Username",
+                placeholderUsername: "Type your nickname...",
+                btnJoin: "Join Game",
+                updatesTitle: "🚀 Latest Updates (v3.0)",
+                maintTitle: "System Updating",
+                maintDesc1: "NovaArt is currently updating. Please do not disconnect and wait for the update to complete.",
+                maintDesc2: "The game will automatically resume once the update is finished...",
+                mobileUsers: "→ Users",
+                scoreTitle: "Leaderboard",
+                clear: "Clear",
+                eraser: "Eraser",
+                placeholderChat: "Type your guess here...",
+                loading: "Loading...",
+                wordWait: "Try to guess the word!",
+                drawTask: "Your Word to Draw: ",
+                category: "Category: ",
+                updates: [
+                    `<strong style="color: #4da6ff;">🌍 Multi-Language Support:</strong> Added Turkish, English, French, German, Spanish, and Arabic (with RTL layout)!`,
+                    `<strong style="color: #4da6ff;">🧽 Professional Eraser Tool:</strong> Added dynamic eraser synchronized with the brush thickness.`,
+                    `<strong style="color: #4da6ff;">🎨 Claret Blue & Rich Colors:</strong> Palette expanded to 10 colors with Trabzonspor's noble claret-blue colors at the top!`,
+                    `<strong style="color: #4da6ff;">🌀 Moving Tab Title:</strong> The browser tab title is now animated and dynamic!`
+                ]
+            },
+            fr: {
+                lobbyTitle: "NovaArt",
+                lobbySubtitle: "Salle NovaArt",
+                lblUsername: "Votre Pseudo",
+                placeholderUsername: "Écrivez votre pseudo...",
+                btnJoin: "Rejoindre le Jeu",
+                updatesTitle: "🚀 Dernières Mises à Jour (v3.0)",
+                maintTitle: "Mise à jour du système",
+                maintDesc1: "NovaArt est en cours de mise à jour. Ne vous déconnectez pas et attendez la fin de la mise à jour.",
+                maintDesc2: "Le jeu reprendra automatiquement une fois la mise à jour terminée...",
+                mobileUsers: "→ Utilisateurs",
+                scoreTitle: "Tableau d'affichage",
+                clear: "Effacer",
+                eraser: "Gomme",
+                placeholderChat: "Écrivez votre supposition ici...",
+                loading: "Chargement...",
+                wordWait: "Essayez de deviner le mot !",
+                drawTask: "Votre mot à dessiner: ",
+                category: "Catégorie: ",
+                updates: [
+                    `<strong style="color: #4da6ff;">🌍 Support multilingue:</strong> Turc, anglais, français, allemand, espagnol et arabe (mise en page RTL) ajoutés !`,
+                    `<strong style="color: #4da6ff;">🧽 Outil Gomme Professionnel:</strong> Ajout d'une gomme dynamique synchronisée avec l'épaisseur du pinceau.`,
+                    `<strong style="color: #4da6ff;">🎨 Grenat-Bleu & Couleurs Riches:</strong> Palette de 10 couleurs avec les nobles couleurs grenat et bleu de Trabzonspor en tête !`,
+                    `<strong style="color: #4da6ff;">🌀 Titre d'onglet animé:</strong> Le titre de l'onglet du navigateur est maintenant animé et vivant !`
+                ]
+            },
+            de: {
+                lobbyTitle: "NovaArt",
+                lobbySubtitle: "NovaArt Raum",
+                lblUsername: "Dein Benutzername",
+                placeholderUsername: "Schreibe deinen Spitznamen...",
+                btnJoin: "Spiel beitreten",
+                updatesTitle: "🚀 Neueste Updates (v3.0)",
+                maintTitle: "Systemaktualisierung",
+                maintDesc1: "NovaArt wird derzeit aktualisiert. Bitte trennen Sie die Verbindung nicht und warten Sie.",
+                maintDesc2: "Das Spiel wird automatisch fortgesetzt, sobald das Update fertig ist...",
+                mobileUsers: "→ Benutzer",
+                scoreTitle: "Bestenliste",
+                clear: "Löschen",
+                eraser: "Radierer",
+                placeholderChat: "Schreibe deine Vermutung hier...",
+                loading: "Laden...",
+                wordWait: "Versuche das Wort zu erraten!",
+                drawTask: "Dein Wort zum Zeichnen: ",
+                category: "Kategorie: ",
+                updates: [
+                    `<strong style="color: #4da6ff;">🌍 Mehrsprachige Unterstützung:</strong> Türkisch, Englisch, Französisch, Deutsch, Spanisch und Arabisch (mit RTL-Layout) hinzugefügt!`,
+                    `<strong style="color: #4da6ff;">🧽 Professioneller Radierer:</strong> Dynamischer Radierer hinzugefügt, der mit der Pinselstärke synchronisiert ist.`,
+                    `<strong style="color: #4da6ff;">🎨 Weinrot-Blau & Satte Farben:</strong> Palette auf 10 Farben erweitert, angeführt von den weinrot-blauen Farben von Trabzonspor!`,
+                    `<strong style="color: #4da6ff;">🌀 Animierter Tab-Titel:</strong> Der Tab-Titel im Browser ist jetzt animiert und lebendig!`
+                ]
+            },
+            es: {
+                lobbyTitle: "NovaArt",
+                lobbySubtitle: "Sala NovaArt",
+                lblUsername: "Tu Nombre de Usuario",
+                placeholderUsername: "Escribe tu apodo...",
+                btnJoin: "Unirse al Juego",
+                updatesTitle: "🚀 Últimas Actualizaciones (v3.0)",
+                maintTitle: "Actualización del Sistema",
+                maintDesc1: "NovaArt se está actualizando. Por favor, no te desconectes y espera a que finalice.",
+                maintDesc2: "El juego se reanudará automáticamente una vez terminada la actualización...",
+                mobileUsers: "→ Usuarios",
+                scoreTitle: "Tabla de puntuación",
+                clear: "Limpiar",
+                eraser: "Borrador",
+                placeholderChat: "Escribe tu suposición aquí...",
+                loading: "Cargando...",
+                wordWait: "¡Intenta adivinar la palabra!",
+                drawTask: "Tu palabra para dibujar: ",
+                category: "Categoría: ",
+                updates: [
+                    `<strong style="color: #4da6ff;">🌍 Soporte multilingüe:</strong> ¡Se agregaron turco, inglés, francés alemán, español y árabe (con diseño RTL)!`,
+                    `<strong style="color: #4da6ff;">🧽 Borrador Profesional:</strong> Borrador dinámico sincronizado con el grosor del pincel.`,
+                    `<strong style="color: #4da6ff;">🎨 Burdeos-Azul y Colores Ricos:</strong> ¡Paleta ampliada a 10 colores con los nobles colores burdeos y azul del Trabzonspor al inicio!`,
+                    `<strong style="color: #4da6ff;">🌀 Título de Pestaña Animado:</strong> ¡El título de la pestaña del navegador ahora es animado y dinámico!`
+                ]
+            },
+            ar: {
+                lobbyTitle: "نوفا آرت",
+                lobbySubtitle: "غرفة نوفا آرت",
+                lblUsername: "اسم المستخدم الخاص بك",
+                placeholderUsername: "اكتب اسم الشهرة الخاص بك...",
+                btnJoin: "انضمام إلى اللعبة",
+                updatesTitle: "🚀 أحدث التحديثات (v3.0)",
+                maintTitle: "تحديث النظام جارٍ",
+                maintDesc1: "يتم تحديث نوفا آرت حاليًا. يرجى عدم قطع الاتصال والانتظار حتى يكتمل التحديث.",
+                maintDesc2: "ستستأنف اللعبة تلقائيًا بمجرد انتهاء التحديث...",
+                mobileUsers: "→ المستخدمين",
+                scoreTitle: "جدول النقاط",
+                clear: "مسح",
+                eraser: "ممحاة",
+                placeholderChat: "اكتب تخمينك هنا...",
+                loading: "جاري التحميل...",
+                wordWait: "حاول تخمين الكلمة!",
+                drawTask: "كلمتك للرسم: ",
+                category: "الفئة: ",
+                updates: [
+                    `<strong style="color: #4da6ff;">🌍 دعم لغات متعددة:</strong> تمت إضافة التركية، الإنجليزية، الفرنسية، الألمانية، الإسبانية، والعربية (مع اتجاه من اليمين إلى اليسار)!`,
+                    `<strong style="color: #4da6ff;">🧽 أداة ممحاة احترافية:</strong> تمت إضافة ممحاة ديناميكية متزامنة مع سمك الفرشاة.`,
+                    `<strong style="color: #4da6ff;">🎨 العنابي والأزرق وألوان غنية:</strong> تم توسيع اللوحة لتشمل 10 ألوان مع وضع ألوان طرابزون سبور العنابية والزرقاء النبيلة في الأعلى!`,
+                    `<strong style="color: #4da6ff;">🌀 عنوان تبويب متحرك:</strong> عنوان تبويب المتصفح الآن متحرك ونشط!`
+                ]
+            }
+        };
+
+        let currentLang = "tr";
+        let lastServerWord = "";
+        let lastServerCategory = "";
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            const t = dictionary[lang];
+
+            // Lobiyi Güncelle
+            document.getElementById("lobby-title").textContent = t.lobbyTitle;
+            document.getElementById("lobby-subtitle").textContent = t.lobbySubtitle;
+            document.getElementById("lbl-username").textContent = t.lblUsername;
+            document.getElementById("username-input").placeholder = t.placeholderUsername;
+            document.getElementById("join-btn").textContent = t.btnJoin;
+            document.getElementById("updates-title").innerHTML = t.updatesTitle;
+
+            // Güncelleme Maddelerini Güncelle
+            const updatesList = document.getElementById("updates-list");
+            updatesList.innerHTML = t.updates.map(item => `<li style="font-size: 14px; line-height: 20px;">${item}</li>`).join('');
+
+            // Bakım Overlay
+            document.getElementById("maint-title").textContent = t.maintTitle;
+            document.getElementById("maint-desc1").textContent = t.maintDesc1;
+            document.getElementById("maint-desc2").textContent = t.maintDesc2;
+
+            // Oyun İçi
+            document.getElementById("mobile-users-title").textContent = t.mobileUsers;
+            document.getElementById("sidebar-score-title").textContent = t.scoreTitle;
+            document.getElementById("clear-btn").textContent = t.clear;
+            document.getElementById("txt-eraser").textContent = t.eraser;
+
+            if (!chatInput.disabled) {
+                chatInput.placeholder = t.placeholderChat;
+            }
+
+            // Aktif roller ve kelime durumları çevirisi
+            if (isDrawer) {
+                wordDisplay.innerText = t.drawTask + (lastServerWord || "...");
+            } else {
+                wordDisplay.innerText = t.wordWait;
+            }
+
+            if (lastServerCategory) {
+                categoryDisplay.innerText = t.category + lastServerCategory;
+            } else {
+                categoryDisplay.innerText = "";
+            }
+
+            // RTL (Arapça) Düzeni için gövde sınıfını güncelle
+            if (lang === "ar") {
+                document.body.classList.add("rtl");
+            } else {
+                document.body.classList.remove("rtl");
+            }
+        }
+
+
+        // ===================================================
+        // 5. HAREKETLİ BAŞLIK (MARQUEE TITLE ENGINE)
+        // ===================================================
+        let scrollTitleText = " NovaArt 3.0 - Çizim ve Tahmin Dünyası!  •  NovaOS  •  NovaLang Team  •  ";
+        function animateBrowserTitle() {
+            scrollTitleText = scrollTitleText.substring(1) + scrollTitleText.substring(0, 1);
+            document.title = scrollTitleText;
+            setTimeout(animateBrowserTitle, 250);
+        }
+        animateBrowserTitle();
+
+
+        // Lobi Katılımı
         joinBtn.addEventListener('click', () => {
             const username = usernameInput.value.trim();
             if (username === "") { alert("Lütfen bir kullanıcı adı girin!"); return; }
@@ -597,12 +890,32 @@
         });
         sidebar.addEventListener('click', (e) => e.stopPropagation());
 
+        // Renk Kutularına Tıklama Yönetimi
         document.querySelectorAll('.color-box').forEach(box => {
             box.addEventListener('click', (e) => {
+                // Silgiyi devreden çıkar fırçaya dön
+                isEraserActive = false;
+                eraserBtn.classList.remove('active');
+
                 document.querySelectorAll('.color-box').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 currentColor = e.target.getAttribute('data-color');
             });
+        });
+
+        // Silgi Aktif Etme / Devre Dışı Bırakma
+        eraserBtn.addEventListener('click', () => {
+            isEraserActive = !isEraserActive;
+            if (isEraserActive) {
+                eraserBtn.classList.add('active');
+                document.querySelectorAll('.color-box').forEach(b => b.classList.remove('active'));
+            } else {
+                eraserBtn.classList.remove('active');
+                // İlk rengi (Bordo) geri seç
+                const firstColorBox = document.querySelector('.color-box');
+                firstColorBox.classList.add('active');
+                currentColor = firstColorBox.getAttribute('data-color');
+            }
         });
 
         thicknessSlider.addEventListener('input', (e) => {
@@ -619,17 +932,22 @@
             isDrawer = data.isDrawer; 
             chatInput.disabled = false;
             
+            lastServerWord = data.word || "";
+            lastServerCategory = data.category || "";
+
+            const t = dictionary[currentLang];
+
             if (data.category) {
-                categoryDisplay.innerText = "Kategori: " + data.category;
+                categoryDisplay.innerText = t.category + data.category;
             } else {
                 categoryDisplay.innerText = "";
             }
 
             if (isDrawer) {
-                wordDisplay.innerText = "Çizeceğin Kelime: " + data.word;
+                wordDisplay.innerText = t.drawTask + data.word;
                 brushSettings.style.display = "flex"; 
             } else {
-                wordDisplay.innerText = "Kelimeyi tahmin etmeye çalışın!";
+                wordDisplay.innerText = t.wordWait;
                 brushSettings.style.display = "none";
             }
         });
@@ -664,15 +982,19 @@
             
             ctx.lineWidth = currentLineWidth; 
             ctx.lineCap = 'round'; 
-            ctx.strokeStyle = currentColor;
+            
+            // Silgi modu aktifse beyaz çiz, değilse seçili rengi çiz
+            const activeColor = isEraserActive ? "#FFFFFF" : currentColor;
+            ctx.strokeStyle = activeColor;
 
             ctx.lineTo(coords.x, coords.y); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(coords.x, coords.y);
+            
             socket.emit('drawing', { 
                 x: coords.x, 
                 y: coords.y, 
                 drawing: true, 
-                color: currentColor,
+                color: activeColor,
                 width: currentLineWidth 
             });
         }
@@ -725,7 +1047,7 @@
         );
 
         console.log(
-            "%cBu alan NovaArt sisteminin motorudur. Kodları değiştirmeye classmak oyununun çökmesine neden olabilir! \n%cEğer bir geliştiriciysen ve parolayı biliyorsan konsola şunu yaz: %cparola('GİZLİ_ŞİFRE')", 
+            "%cBu alan NovaArt sisteminin motorudur. Kodları değiştirmeye çalışmak oyunun çökmesine neden olabilir! \n%cEğer bir geliştiriciysen ve parolayı biliyorsan konsola şunu yaz: %cparola('GİZLİ_ŞİFRE')", 
             "color: #fff; font-size: 14px; background: #2d2d38; padding: 10px; border-radius: 6px; line-height: 20px;",
             "color: #aaa; font-size: 14px;",
             "color: #ff9933; font-weight: bold; font-family: monospace; font-size: 14px;"
@@ -743,7 +1065,7 @@
         };
 
         // ===================================================
-        // 1. FARE TAKİP EDEN ÇİZGİ SİSTEMİ
+        // FARE TAKİP EDEN ÇİZGİ SİSTEMİ
         // ===================================================
         const trailCanvas = document.getElementById('cursorTrailCanvas');
         const trailCtx = trailCanvas.getContext('2d');
@@ -793,7 +1115,7 @@
 
 
         // ===================================================
-        // 2. NOVAART SADECE MÜZİK MOTORU SİSTEMİ
+        // MÜZİK MOTORU SİSTEMİ
         // ===================================================
         const lobbyMusic = document.getElementById('lobbyMusic');
         const muteBtn = document.getElementById('muteBtn');
@@ -816,15 +1138,18 @@
 
         const maintenanceOverlay = document.getElementById('maintenance-overlay');
 
-// Sunucudan güncelleme başladı sinyali gelirse ekranı kilitle
-socket.on('maintenance-start', () => {
-    maintenanceOverlay.style.display = 'flex';
-});
+        // Sunucudan güncelleme başladı sinyali gelirse ekranı kilitle
+        socket.on('maintenance-start', () => {
+            maintenanceOverlay.style.display = 'flex';
+        });
 
-// Sunucudan güncelleme bitti sinyali gelirse ekranı aç
-socket.on('maintenance-end', () => {
-    maintenanceOverlay.style.display = 'none';
-});
+        // Sunucudan güncelleme bitti sinyali gelirse ekranı aç
+        socket.on('maintenance-end', () => {
+            maintenanceOverlay.style.display = 'none';
+        });
+
+        // Varsayılan olarak başlangıç dilini ayarla
+        changeLanguage("tr");
     </script>
 </body>
 </html>
