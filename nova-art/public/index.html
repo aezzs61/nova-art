@@ -467,6 +467,33 @@
             width: 32px !important;
             height: 32px !important;
         }
+
+#inviteBtn {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#inviteBtn:hover {
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+#inviteBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
     </style>
 </head>
 <body>
@@ -505,6 +532,7 @@
                     </div>
                     <button id="join-btn">Oyuna Katıl</button>
                 </div>
+<button id="inviteBtn" onclick="copyInviteLink()">Arkadaşını Davet Et 🔗</button>
 
                 <div style="flex: 1; min-width: 320px; background: #2d2d38; padding: 25px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #444455; display: flex; flex-direction: column; text-align: left;">
                     <h2 id="updates-title" style="color: #ff9933; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #444455; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
@@ -1250,6 +1278,16 @@ window.admin = function(sifre, eylem, mesaj = "") {
         });
 
         changeLanguage("tr");
+function copyInviteLink() {
+    const gameUrl = window.location.href; // Mevcut oyun linkini alır
+    
+    navigator.clipboard.writeText(gameUrl).then(() => {
+        // Kopyalandıktan sonra kullanıcıya şık bir bildirim gösterebilirsin
+        alert("Davet linki panoya kopyalandı! Arkadaşına gönderebilirsin.");
+    }).catch(err => {
+        console.error("Link kopyalanamadı: ", err);
+    });
+}
     </script>
 </body>
 </html>
