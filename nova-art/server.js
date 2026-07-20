@@ -184,3 +184,39 @@ process.stdin.on('data', (data) => {
         io.emit('maintenance-end'); // Ekranı kapatır
     }
 });
+
+// GİZLİ GELİŞTİRİCİ ŞİFRESİ (Sadece sunucuda durur, istemci göremez!)
+const ADMIN_PASSWORD = process.env.ADMIN_KEY || "nova61_gizli_admin_key"; 
+
+io.on('connection', (socket) => {
+    
+    // Geliştirici Komut Dinleyicisi
+    socket.on('admin-command', (data) => {
+        // 1. Şifre Kontrolü (Sunucuda yapılır)
+        if (data.password !== ADMIN_PASSWORD) {
+            socket.emit('system-message', '❌ Yetkisiz erişim denemesi! Şifre hatalı.');
+            return;
+        }
+
+        // 2. Komut Yönetimi
+        switch (data.action) {
+            case 'bakim_baslat':
+                io.emit('maintenance-start');
+                io.emit('system-message', '🛠️ Sistem yönetici tarafından bakıma alındı.');
+                break;
+                
+            case 'bakim_bitir':
+                io.emit('maintenance-end');
+                io.emit('system-message', '✅ Bakım modu sona erdi, iyi oyunlar!');
+                break;
+
+            case 'duyuru':
+                io.emit('system-message', `📢 [SİSTEM DUYURUSU]: ${data.message}`);
+                break;
+
+            default:
+                socket.emit('system-message', '❓ Tanımsız admin komutu.');
+        }
+    });
+
+});
